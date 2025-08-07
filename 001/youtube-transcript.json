@@ -1,0 +1,874 @@
+{
+  "name": "001-youtube-transcripts",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72590fa0-cf12-4249-80fc-7aaec9992390",
+              "name": "automationID",
+              "type": "string",
+              "value": "001-youtube-transcript"
+            },
+            {
+              "id": "24e9b1c3-2955-4e0b-9b4b-a6b9d046fb72",
+              "name": "apiKey",
+              "type": "string",
+              "value": "enter-your-api-key-here"
+            },
+            {
+              "id": "b6600a42-1b8d-486a-a51d-0868bc45452e",
+              "name": "youtubeURL",
+              "type": "string",
+              "value": "https://www.youtube.com/watch?v=pBkgtfG00ck&ab_channel=%E8%B5%9B%E5%8D%9A%E7%A8%8B%E5%BA%8F%E5%91%98%E8%B5%B5%E5%B8%88%E5%82%85"
+            },
+            {
+              "id": "ce9a9a40-5ae4-4106-ae61-0daba2ec185f",
+              "name": "promptType",
+              "type": "string",
+              "value": "transcript"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b21d4b03-55c2-40de-8c70-d359e85db4b7",
+      "name": "Set: Define Initial Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [-3568, -336],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "4ba139e4-2fd7-473f-869d-f27a1a2f3823",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.promptType.toLowerCase() }}",
+                    "rightValue": "transcript"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Transcript"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "486f3c1c-7203-4bc5-a796-87939d4360c5",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.promptType.toLowerCase() }}",
+                    "rightValue": "timestamps"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Transcript with Timestamps"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "814597ad-12ff-450d-a4bc-cd2eb2836d8f",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.promptType.toLowerCase() }}",
+                    "rightValue": "summary"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Summary"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "759debf2-3dfb-4bdd-b41f-7ef0a709e25e",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.promptType.toLowerCase() }}",
+                    "rightValue": "scene"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Scene Description"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "5c66a390-2566-461d-b9bc-b0e7ebdc4af8",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.promptType.toLowerCase() }}",
+                    "rightValue": "clips"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Clips"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "e1bac4fc-1e03-4d0f-b0b4-c1750e50e8d3",
+      "name": "Switch: What kind of question do we want to ask?",
+      "type": "n8n-nodes-base.switch",
+      "position": [-2928, -400],
+      "typeVersion": 3.2,
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be68e95-53df-492f-a88a-14c06f51f531",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Please provide a detailed description of the scene in the video, including:\n\nSetting: Where the scene takes place (e.g., indoors, outdoors, specific location). Be specific - is it a forest, a city street, a living room?\n\nObjects: Prominent objects visible in the scene (e.g., furniture, vehicles, natural elements). Include details like color, size, and material if discernible.\n\nPeople: Description of any people present, including their appearance (clothing, hair, etc.), approximate age, and any actions they are performing.\n\nLighting: The overall lighting of the scene (e.g., bright, dim, natural, artificial). Note any specific light sources (lamps, sunlight).\n\nColors: Dominant colors and color palettes used in the scene.\n\nCamera Angle/Movement: Describe the camera perspective (e.g., close-up, wide shot, aerial view) and any camera movement (panning, zooming, static).\n\nStart output directly with the response -- do not include any introductory text or explanations."
+            },
+            {
+              "id": "bfa3b421-643d-4a52-93e9-0830f794140b",
+              "name": "model",
+              "type": "string",
+              "value": "gemini-1.5-flash"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "492dc0a0-2728-4b27-9974-3263097a0d80",
+      "name": "Set: Scene Prompt",
+      "type": "n8n-nodes-base.set",
+      "position": [-2256, -240],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be68e95-53df-492f-a88a-14c06f51f531",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Provide a concise summary of the main points in nested bullets, using quotes only when absolutely essential for clarity. Start output directly with the response."
+            },
+            {
+              "id": "ccc44699-0918-4837-89a6-c763b157fc8c",
+              "name": "model",
+              "type": "string",
+              "value": "gemini-1.5-flash"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "0eb4ef2e-c14a-4e02-bffa-6bf1e305b8cd",
+      "name": "Set: Summarize Prompt",
+      "type": "n8n-nodes-base.set",
+      "position": [-2256, -432],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be68e95-53df-492f-a88a-14c06f51f531",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Transcribe the video. Return only the spoken dialogue, verbatim. Omit any additional text or descriptions."
+            },
+            {
+              "id": "b445c2da-934f-4a78-a57b-f383d8950f8a",
+              "name": "model",
+              "type": "string",
+              "value": "gemini-1.5-flash"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "f1f15b98-58b5-4b0a-974a-4ba81c6576ce",
+      "name": "Set: Transcript Prompt",
+      "type": "n8n-nodes-base.set",
+      "position": [-2256, -832],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be68e95-53df-492f-a88a-14c06f51f531",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Summarize this YouTube video with a focus on actionable insights. Use nested bullets and include relevant quotes. Specifically, highlight any recommended tools, strategies, or resources mentioned."
+            },
+            {
+              "id": "da626eb8-a097-4a65-834d-4d1709aed260",
+              "name": "model",
+              "type": "string",
+              "value": "gemini-1.5-flash"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1275f4c5-cb7a-47a2-9800-8233684c8797",
+      "name": "Set: Fallback",
+      "type": "n8n-nodes-base.set",
+      "position": [-2256, 176],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be68e95-53df-492f-a88a-14c06f51f531",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Generate a timestamped transcript of the video. Each line must follow this format precisely:  [hh:mm:ss] Dialogue. Return only the timestamp and spoken content; omit any other text or formatting.  "
+            },
+            {
+              "id": "98ca7af8-0fbd-4ba8-8fc8-f914e5bbe48a",
+              "name": "model",
+              "type": "string",
+              "value": "gemini-1.5-flash"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "c5b5285e-57d5-49f6-8f3b-f19c5001a019",
+      "name": "Set: Transcript with Timestamps Prompt",
+      "type": "n8n-nodes-base.set",
+      "position": [-2256, -640],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be68e95-53df-492f-a88a-14c06f51f531",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Extract shareable clips for social media. Each clip must include:\n\n* **Timestamp:** [hh:mm:ss]-[hh:mm:ss]\n* **Transcript:** Verbatim dialogue/text within the clip.\n* **Rationale:**  A concise explanation (under 20 words) of the clip's social media appeal (e.g., \"humorous,\" \"controversial,\" \"inspiring,\" \"informative\").  Focus on virality, engagement potential (shares, likes, comments).\n\nStart output directly with the response -- do not include any introductory text or explanations."
+            },
+            {
+              "id": "0493ffa7-4fef-4e48-b9d7-7f0891660325",
+              "name": "model",
+              "type": "string",
+              "value": "gemini-1.5-flash"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "83dfb04f-1f45-4581-a9df-a1dfa88f9c4f",
+      "name": "Set: Scene Clips",
+      "type": "n8n-nodes-base.set",
+      "position": [-2256, -32],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "# 如何使用此工作流\n\n使用此工作流轻松分析YouTube视频。首先请求摘要或转录——然后根据您的需求和正在处理的内容类型调整提示。\n\n更令人印象深刻的是？您可以针对视频中发生的事情提出具体问题——识别人物、场景和视觉细节。提取这种深度洞察的能力将改变游戏规则。\n\n此工作流具有高度适应性——操作会根据您设置的值进行调整。通过单一流程，您可以生成转录、创建详细的YouTube描述以及起草摘要博客文章。\n\n触发器也很灵活。手动运行、连接到webhook，或通过Airtable或其他系统自动化。输出可以发送到任何地方——Notion、Google Docs、CMS平台——或者简单地保留在n8n中进行即时分析。\n\n此工作流使用n8n 1.82.3创建。\n\n## 要求\n* [Google API密钥](https://console.developers.google.com/)（或通过[AI Studio](https://aistudio.google.com/apikey)获取）\n\n## 测试\n* 此工作流已在从短视频到约一小时长度的各种公开YouTube视频上进行了测试。\n\n## 未来兼容性\n* 此工作流是为与gemini-1.5-flash一起使用而创建的。未来，可以更新提示的设置节点以使用不同的模型，并可能在http节点中添加应使用的API端点。\n\n## 文档\n* [探索Gemini API的视觉能力](https://ai.google.dev/gemini-api/docs/vision?lang=python)\n* [定价](https://ai.google.dev/gemini-api/docs/pricing)",
+        "height": 820,
+        "width": 780,
+        "color": 4
+      },
+      "id": "feada7f8-da79-4812-9830-30a7b23ba309",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-4656, -640],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "300bfbe7-8d13-41ba-8828-17bba1d0eabe",
+              "name": "answerAIGenerated",
+              "type": "string",
+              "value": "={{ $json.candidates?.[0]?.content?.parts?.[0]?.text ? $json.candidates[0].content.parts[0].text : ($json.error ? $json.error : \"No content or error found\") }}"
+            },
+            {
+              "id": "a54eeb5d-e4de-4fd9-a15c-be51cc414c46",
+              "name": "promptTokenCount",
+              "type": "string",
+              "value": "={{ $json.usageMetadata?.promptTokenCount ? $json.usageMetadata.promptTokenCount : ($json.error ? $json.error : \"No content or error found\") }}"
+            },
+            {
+              "id": "dd590788-069e-48d9-adb2-6a5d10f8af2f",
+              "name": "candidatesTokenCount",
+              "type": "string",
+              "value": "={{ $json.usageMetadata?.candidatesTokenCount ? $json.usageMetadata.candidatesTokenCount : ($json.error ? $json.error : \"No content or error found\") }}"
+            },
+            {
+              "id": "23766495-25df-4d3d-bc62-9e79a860ee19",
+              "name": "totalTokenCount",
+              "type": "string",
+              "value": "={{ $json.usageMetadata?.totalTokenCount ? $json.usageMetadata.totalTokenCount : ($json.error ? $json.error : \"No content or error found\") }}"
+            },
+            {
+              "id": "cfad5ba2-a2c5-48ff-b64b-9131a51fd23c",
+              "name": "modelVersionUsed",
+              "type": "string",
+              "value": "={{ $json.modelVersion ? $json.modelVersion : ($json.error ? $json.error : \"No content or error found\") }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "except",
+        "excludeFields": "candidates, usageMetadata",
+        "options": {}
+      },
+      "id": "e54e41ef-cdff-4395-b278-e9e5b6157c2c",
+      "name": "Set Fields: Define Outcome",
+      "type": "n8n-nodes-base.set",
+      "position": [80, -336],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $json.model }}:generateContent?key={{ $json.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [\n      { \"text\": {{ JSON.stringify($json.prompt) }} },\n      { \"file_data\": { \"file_uri\": \"{{ $json.youtubeURL }}\" } }\n    ]\n  }]\n}",
+        "options": {}
+      },
+      "id": "7b8ca217-423b-408f-9d85-328786138949",
+      "name": "HTTP Request to Google",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [-992, -336],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "4200cb86-3c71-47e1-90a4-2f43451c0302",
+      "name": "Set: Merged Values",
+      "type": "n8n-nodes-base.set",
+      "position": [-1360, -336],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "148e9a72-f826-468c-86a3-471873717ed4",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.error }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "03a7684b-6397-4849-8fca-d83c1ffbff84",
+      "name": "If: Was an error detected?",
+      "type": "n8n-nodes-base.if",
+      "position": [-240, 352],
+      "typeVersion": 2.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 提示灵感创意\n\n将这些提示作为您工作流程的灵感来源。快速迭代想法的方法是在[https://aistudio.google.com/](https://aistudio.google.com/)中尝试它们。\n\n### 📝 核心视频摘要工具（快速内容消化）\n用嵌套项目符号简洁总结该YouTube视频的要点，仅在绝对必要为清晰时使用引号。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### 🚀 完整YouTube SEO套餐生成器（内容营销）\n\n根据以下文字记录生成完整的YouTube套餐（标题、描述、关键词和时间戳）：\n\n**说明：**\n\n* **标题：** 制作一个简洁吸引人的标题（60个字符以内），准确反映视频内容并吸引观众。\n* **描述：** 撰写详细描述（约150-200字），总结视频中涵盖的关键主题。该描述应：\n    * 清晰概述观众的价值主张（他们将学到或获得什么）。\n    * 包含相关关键词以提高可搜索性。\n    * 包含强有力的行动号召（如订阅、访问网站、关注社交媒体）。\n    * 可选地在开头加入简短有趣的钩子以吸引观众注意。\n* **关键词：** 生成相关关键词和标签列表（约10-15个），准确描述视频内容并帮助观众在搜索结果中找到它。考虑：\n    * 讨论的具体主题\n    * 相关术语和概念\n    * 行业术语（如适用）\n    * 提及的人物或产品名称\n* **时间戳：** 为视频中的关键主题或部分生成时间戳。这些应清晰格式化以便轻松导航。例如：\n    * 0:00 介绍\n    * 1:15 主题1\n    * 3:45 主题2 ...等。\n\n**重要考虑因素：**\n\n* **目标受众：** 假设目标受众是[描述您的目标受众——例如，学习Python的初学者、经验丰富的营销人员、对园艺感兴趣的人]。\n* **整体语气：** 整个套餐的语气应为[指定所需语气——例如，信息丰富且教育性、热情且吸引人、幽默且轻松]。\n* **视频目的：** 视频的主要目标是[说明视频的目标——例如，教授技能、提供信息、娱乐、说服]。\n\n**可选：**\n* 如果视频推广产品、服务或其他内容，请在描述中包含相关链接。\n* 如果有任何应包含的特定短语或品牌元素，请在此处指定。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### 🗺️ 结构化视频内容地图（教育组织）\n\n无介绍性文字总结该YouTube视频的关键点。遵循此结构化格式：\n\n主要主题\n* 使用二级标题（##）根据关键主题组织内容。\n\n每个标题下：\n* 仅列出最基本的概念，使用简洁的项目符号。\n* 在保持清晰的同时确保技术准确性。\n\n适用时按此顺序组织部分：\n* 概述与背景\n* 核心概念与特点\n* 工作原理\n* 优点与缺点\n\n格式规则：\n* 使用Markdown以提高结构化可读性。\n* 保持项目符号简单（避免嵌套）。\n* 无摘要、结论或额外解释——仅结构化内容。\n\n### 🎯 目标导向学习摘要（个人发展）\n\n我正在尝试学习[具体目标，例如“如何提高我的公开演讲技巧”，“Web开发的最新趋势”]。使用嵌套项目符号和引号总结相关信息，重点关注它如何帮助我实现这一目标。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### ⚙️ 可操作见解框架（实施计划）\n\n提取可操作见解，重点关注实际应用和建议。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n使用Markdown格式化摘要并遵循此结构：\n\n问题陈述\n* 总结解决的核心问题或主题。\n\n关键解决方案与建议\n* 每个主要解决方案或建议使用单独的##标题。\n\n实施步骤：\n* 每个解决方案下列出关键步骤，使用项目符号。\n\n预期结果与好处：\n* 描述每个解决方案的潜在影响和优势。\n\n资源与工具\n* 列出任何提到的相关工具、框架或资源。\n\n### 💡 概念提取器与支持引文（深度内容分析）\n\n使用嵌套项目符号提取呈现的核心概念。为每个概念包含支持引文。专注于[特定主题/领域，例如“AI对营销的影响”，“有效沟通的原则”等]。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### 👥 受众针对性视频分析（专业发展）\n\n针对[指定目标受众，例如“软件工程师”，“营销专业人士”，“普通读者”]分析此视频。\n\n使用Markdown格式化摘要并按以下结构组织：\n\n主要主题\n使用二级标题（##）组织关键点，重点关注基本见解。\n建议部分（根据需要调整）：\n概述（背景与上下文）\n关键概念与特点\n工作原理（技术或实践解释）\n好处与挑战\n关键说明：\n\n根据[目标受众]及其预期专业水平定制内容。\n使用项目符号以提高清晰度和简洁性。\n加粗关键术语以强调重要想法。\n确保技术准确性，仅在需要时简化复杂想法。\n进行比较时使用表格。\n长度指南：\n\n总结约[指定所需长度，例如“200字”，“500字”，“一页”]。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### 🧠 知识扩展分析器（高级学习与分析）\n\n假设我已经理解[简要说明相关背景知识]，提供建立在此知识基础上的具体见解。使用嵌套项目符号和相关引文。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### 🔍 论点分析蓝图（批判性思维）\n\n分析视频中提出的论点。使用嵌套项目符号概述主要主张和支持证据。包括直接引文以说明关键点。识别推理中任何潜在的反对论点或弱点。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### ⚖️ YouTube论点分析器（辩论与修辞）\n\n分析此YouTube视频中提出的论点。使用嵌套项目符号概述主要主张和支持证据。包括直接引文以说明关键点。识别推理中任何潜在的反对论点或弱点。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。\n\n### 🎭 修辞技巧评估器（沟通分析）\n\n分析演讲者的[例如，演讲风格、说服技巧、修辞运用]。使用嵌套项目符号并包括具体引文以说明您的观察。重点关注这些技巧如何促进（或削弱）视频的整体信息。\n\n直接开始输出响应——不要包含任何介绍性文字或解释。",
+        "height": 3580,
+        "width": 780,
+        "color": 4
+      },
+      "id": "e61cb55b-0500-4c3e-b664-272397bde015",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-4656, 256],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  json: {\n    ...$json, // Keep data from http request\n    ...$('Set: Merged Values').item.json, // Keep data from before http request\n  }\n};\n\n\n\n"
+      },
+      "id": "661da97a-66a9-4f10-8809-6b13e66325ff",
+      "name": "Code: Merge data from prior nodes with HTTP Output",
+      "type": "n8n-nodes-base.code",
+      "position": [-400, -336],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## ✏️ 设置流程中使用的值\n1. automationID: 用于引用自动化流程。当有多个流程运行时，这对故障排查很有帮助。\n2. apiKey: 来自Google的API密钥\n3. youtubeURL: 待处理视频的公开URL\n4. promptType: 由开关节点使用，决定作为API调用的一部分发送哪个提示。\n    - transcript: 转录原始视频脚本,逐字记录\n    - timestamps: 转录生成视频的时间戳文本\n    - summary: 总结视频，简明扼要地总结要点\n    - scene: 转录视频场景、镜头、人物、光线设定\n    - clips: 提取适合社交媒体分享的片段",
+        "height": 616,
+        "width": 560
+      },
+      "id": "88c96338-0ce8-4dad-820f-95097f16f011",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-3808, -640],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 根据promptType值确定API调用中传递的提示词",
+        "height": 520,
+        "width": 560
+      },
+      "id": "b5ddd37e-88b1-4f96-9ba9-1ad5b6e6af9c",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-3200, -544],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ✏️ 设置提示词与模型参数  \n1. 提示词：你想了解视频的哪些信息  \n2. 模型：选择使用的模型（gemini-1.5-flash）",
+        "height": 1520,
+        "width": 560
+      },
+      "id": "675833b1-09d4-40fa-a320-ee636489cecf",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-2448, -1040],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 简化http节点中值的引用",
+        "height": 520,
+        "width": 260
+      },
+      "id": "3ec18a38-ead5-4d8a-ba8a-747fa006a843",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-1440, -512],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 如需在出现错误时添加特殊处理（可选）",
+        "height": 520,
+        "width": 560,
+        "color": 3
+      },
+      "id": "bb963254-2411-43ab-a9c9-42543c84030d",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-480, 128],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 使用先前节点设置的值调用Google端点\n",
+        "height": 520,
+        "width": 260
+      },
+      "id": "b5c0cc13-cd2a-49ab-ad7d-0ddff57ca834",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-1056, -512],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 将Google返回的数据与先前节点设置的值合并，以避免早期数据丢失",
+        "height": 520,
+        "width": 300
+      },
+      "id": "a6c78b3f-c9fa-44ed-ae76-3140cb8f2c8c",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-496, -512],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 为返回数据赋予有意义的名称；简化后续节点可用的数据量",
+        "height": 520,
+        "width": 300
+      },
+      "id": "874c4ed0-3171-436b-9aed-c93fbf58f3f5",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-32, -512],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "#### 💡 下一步建议\n使用Webhook将数据发送到其他目的地，或利用n8n的其他节点将数据推送至Notion等平台。",
+        "height": 240,
+        "width": 360,
+        "color": 4
+      },
+      "id": "9fd6fc93-692a-4f26-ade1-935af7a1b59d",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1152, -512],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-4160, -336],
+      "id": "36fb6336-80fd-4e34-a1bc-be9d24f7fd0e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let str = $input.item.json.answerAIGenerated\n\nreturn {\n  'output': str.replace(/\\n\\n/g, '\\n')\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [496, -336],
+      "id": "af2c6e94-01b9-4b84-b91b-5cef06435e7e",
+      "name": "code:trim"
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 为文本清理脏乱数据",
+        "height": 512,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [400, -512],
+      "id": "ec744cc6-8ad1-48ba-b6e2-bdcae2b49072",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "={{$('Set: Merged Values').item.json.automationID+'-'+$now}}.txt"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [896, -336],
+      "id": "8f2123a5-e783-4e80-82cc-02b85e3b287b",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "## ℹ️ 直接下载文件",
+        "height": 512,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [768, -512],
+      "id": "4e54d9e8-4405-4b12-a0e6-7015590d12ad",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set: Fallback": {
+      "main": [
+        [
+          {
+            "node": "Set: Merged Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Scene Clips": {
+      "main": [
+        [
+          {
+            "node": "Set: Merged Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Scene Prompt": {
+      "main": [
+        [
+          {
+            "node": "Set: Merged Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Merged Values": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Summarize Prompt": {
+      "main": [
+        [
+          {
+            "node": "Set: Merged Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Google": {
+      "main": [
+        [
+          {
+            "node": "Code: Merge data from prior nodes with HTTP Output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If: Was an error detected?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Transcript Prompt": {
+      "main": [
+        [
+          {
+            "node": "Set: Merged Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Define Initial Variables": {
+      "main": [
+        [
+          {
+            "node": "Switch: What kind of question do we want to ask?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Transcript with Timestamps Prompt": {
+      "main": [
+        [
+          {
+            "node": "Set: Merged Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch: What kind of question do we want to ask?": {
+      "main": [
+        [
+          {
+            "node": "Set: Transcript Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set: Transcript with Timestamps Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set: Summarize Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set: Scene Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set: Scene Clips",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set: Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: Merge data from prior nodes with HTTP Output": {
+      "main": [
+        [
+          {
+            "node": "Set Fields: Define Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set: Define Initial Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Fields: Define Outcome": {
+      "main": [
+        [
+          {
+            "node": "code:trim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code:trim": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b2d8d289-90ce-4e07-beb9-9e3c9c7e0072",
+  "meta": {
+    "instanceId": "5e625b5608e930abe33b2b4e85cd61aef4f57fd6de67f21d46ac442545f1efd2"
+  },
+  "id": "Ii7FC1Sz0kWy1mg9",
+  "tags": []
+}
