@@ -1,0 +1,235 @@
+{
+  "name": "003-tool-records-by-date",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Ensure there's at least one input item.\nif (!items || items.length === 0) {\n  throw new Error(\"No input items found.\");\n}\n\n// Our input is expected to have a 'data' property containing the JSONP string.\nconst input = items[0].json;\n\nif (!input.data) {\n  throw new Error(\"Input JSON does not have a 'data' property.\");\n}\n\nconst rawData = input.data;\n\n// Use a regex to extract the JSON content from the Google Visualization JSONP response.\nconst regex = /google\\.visualization\\.Query\\.setResponse\\((.*)\\);?$/s;\nconst match = rawData.match(regex);\n\nif (!match) {\n  throw new Error(\"Input data does not match the expected Google Visualization JSONP format.\");\n}\n\nconst jsonString = match[1];\n\n// Parse the extracted JSON string.\nlet parsed;\ntry {\n  parsed = JSON.parse(jsonString);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Verify that the parsed JSON has the expected 'table' structure with 'cols' and 'rows'.\nif (!parsed.table || !Array.isArray(parsed.table.cols) || !Array.isArray(parsed.table.rows)) {\n  throw new Error(\"Parsed JSON does not have the expected 'table' structure with 'cols' and 'rows'.\");\n}\n\nconst cols = parsed.table.cols;\nconst rows = parsed.table.rows;\n\n// Helper function to convert date string from \"Date(YYYY,M,D)\" to \"YYYY-MM-DD\"\nfunction formatDate(dateStr) {\n  const match = dateStr.match(/^Date\\((\\d+),(\\d+),(\\d+)\\)$/);\n  if (!match) return dateStr;\n  const year = parseInt(match[1], 10);\n  const month = parseInt(match[2], 10) + 1; // JavaScript months are 0-indexed\n  const day = parseInt(match[3], 10);\n  // Format with leading zeros\n  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;\n}\n\n// Map each row into an object using the column labels as keys.\nconst newItems = rows.map(row => {\n  const obj = {};\n  cols.forEach((col, index) => {\n    let value = row.c && row.c[index] ? row.c[index].v : null;\n    // If the column type is \"date\" and the value is a string that looks like \"Date(YYYY,M,D)\"\n    if (col.type === \"date\" && typeof value === \"string\") {\n      value = formatDate(value);\n    }\n    obj[col.label] = value;\n  });\n  return { json: obj };\n});\n\n// Return the new array of items.\nreturn newItems;\n"
+      },
+      "id": "7606489c-18fc-420c-ae01-31081edffe59",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "position": [736, 304],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "start_date"
+            },
+            {
+              "name": "end_date"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "sheet_url"
+            }
+          ]
+        }
+      },
+      "id": "ecb04cbf-032f-45ae-8ec9-620f73ffa9ae",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [160, 304],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "1057c5c1-8a3f-497f-81ec-d1f7bef37aa3",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [1168, 304],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "要将所有项目发送回AI，我们需要将所有内容汇总成一个单一项目完成。\n\n否则它会一次只响应一个项目，而AI只会收到",
+        "height": 400,
+        "width": 220,
+        "color": 7
+      },
+      "id": "eb6d74ec-778e-4eb8-af8b-9a6fd2b585e2",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1104, 64],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "该节点向Google Sheets API发送自定义HTTP请求。\n\n在Google Sheets API中按日期范围筛选非常复杂。\n\n此节点解决了该问题。\n\n但在数据库中实现相同功能则简单得多，工具无需子工作流即可完成。",
+        "height": 400,
+        "width": 300,
+        "color": 7
+      },
+      "id": "7a05ae57-1c35-4591-b3e1-1b9c579af854",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [336, 64],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "这个复杂请求的输出结果也很混乱。\n\n所以我们用了一些由ChatGPT生成的代码来将数据转换为JSON对象。",
+        "height": 400,
+        "width": 220,
+        "color": 7
+      },
+      "id": "4e1ab7dd-e502-45d9-9d2d-ff62219baf33",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [656, 64],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{$json.sheet_url}}/gviz/tq",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sheet",
+              "value": "Sheet1"
+            },
+            {
+              "name": "tq",
+              "value": "=SELECT * WHERE A >= DATE \"{{ $json.start_date }}\" AND A <= DATE \"{{ $json.end_date }}\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fca6eefa-90b8-48c6-a9b1-450080ff916d",
+      "name": "Google Sheets request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [448, 304],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xlEP6tfSqenVmLrj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 子工作流\nAI可以随时调用此子工作流，\n通过使用 **按日期记录** 工具。\n\n子工作流会自动将\n最后一个执行节点的结果返回给AI。",
+        "height": 520,
+        "width": 1380,
+        "color": 7
+      },
+      "id": "18428191-5177-4637-9d0d-44ea5bf68ae4",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [0, 0],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "e50da873-bbbd-41d3-a418-83193907977c",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "={{ $('When Executed by Another Workflow').item.json.status }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5d573f2e-de9e-4d64-9946-1b2fe8f44bd5",
+      "name": "Filter by status",
+      "type": "n8n-nodes-base.filter",
+      "position": [944, 304],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "## 👆 Change the URL of the Sheets file",
+        "height": 100,
+        "width": 260,
+        "color": 4
+      },
+      "id": "7ead9008-a449-4818-a453-14416d500057",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [384, 480],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Filter by status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter by status": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ab73b3d6-d48f-44be-bddd-dfb7080797f6",
+  "meta": {
+    "instanceId": "5e625b5608e930abe33b2b4e85cd61aef4f57fd6de67f21d46ac442545f1efd2"
+  },
+  "id": "KWGvh1pQb3TZNKzp",
+  "tags": []
+}
