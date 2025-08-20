@@ -1,0 +1,126 @@
+{
+  "name": "002-tool-send-email",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "ToEmail"
+            },
+            {
+              "name": "Subject"
+            },
+            {
+              "name": "Content"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0ba3a1d3-a3db-46f4-9e19-0d3ae718a062",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e335078a-b0d7-4caf-b239-8c54f6c3b10d",
+              "name": "response",
+              "value": "ok",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "12b71cad-6880-431c-9844-02b1d113a72b",
+      "name": "Define: Ouput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "zhaoliangsyn@gmail.com",
+        "toEmail": "={{ $json.ToEmail }}",
+        "subject": "={{ $json.Subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.Content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "430b3248-c9ca-4dc0-8274-42dba754f633",
+      "name": "Send email",
+      "webhookId": "5870eb67-96f3-4a5d-8126-190d4504ee65",
+      "credentials": {
+        "smtp": {
+          "id": "bojprpl7hj8ETL6X",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "ToEmail": "zhaoliangsyn@163.com",
+          "Subject": "test",
+          "Content": "test it"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Define: Ouput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "030c805e-10b5-4c3b-9b50-4bde627dd1e1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5e625b5608e930abe33b2b4e85cd61aef4f57fd6de67f21d46ac442545f1efd2"
+  },
+  "id": "RT8bbhI4G5gHoG4O",
+  "tags": []
+}
